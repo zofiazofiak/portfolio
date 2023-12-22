@@ -2,7 +2,7 @@ import os
 import shutil
 import time
 
-# Ścieżka do folderu, który będzie monitorowany (np. folder Pobrane)
+
 folder_to_track = r'C:\Users\zosia\Downloads'  # Zmień na właściwą ścieżkę
 
 # Słownik mapujący rozszerzenia plików na ścieżki docelowych folderów
