@@ -1,22 +1,49 @@
-import requests
+import googlemaps
+from googlemaps import Client
+from googlemaps.places import places_nearby
+from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+nltk.download('vader_lexicon')
+def analyze_sentiment(text):
+    sia = SentimentIntensityAnalyzer()
+    sentiment = sia.polarity_scores(text)
+    return sentiment
 
+# Konfiguruje klienta API
+gmaps = Client(key='tu klucz api')
 
-def fetch_place_details(place_id, api_key):
-    url = f"https://maps.googleapis.com/maps/api/place/details/json?placeid={place_id}&key={api_key}"
+# Szuka miejsca bazując na wprowadzonej lokalizacji
+places = gmaps.places_nearby(location='49.95007486001696, 18.493966693112732', radius=100, keyword='...........')
 
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
+# Pobiera opinie z podanego miejsca
+place_id = places['results'][0]['place_id']
+reviews = gmaps.place(place_id)['result']['reviews']
+
+# Analizuje
+for review in reviews:
+    text = review['text']
+
+    # używa nltk
+    sentiment = analyze_sentiment(text)
+
+    # Pisze odpowiedź w zależności od wypowiedzi
+    if sentiment['compound'] >= 0.05:
+        response = "Dziękujemy za pozytywną opinię! Cieszymy się że masz pozytywne wrażenia."
+    elif sentiment['compound'] <= -0.05:
+        response = "Bardzo przepraszamy za uniedogodnienia. Weźmiemy pod uwagę twoją opinię i postaramy się poprawić."
     else:
-        return None
+        response = "Dziękujemy za twoją opinię. Każda informacja zwrotna jest dla nas na wagę złota."
+
+    print(f"Review: {text}\nSentiment: {sentiment}\nSuggested Response: {response}\n")
 
 
-# Użycie funkcji
-api_key = 'AIzaSyDtWk_6Dfntvt-nOaOa1xQ0ViY8JgpoTzU'
-place_id = 'ChIJkYZ6jtBTEUcRB49jj4eb4e4'  # ID miejsca, które chcesz zbadać
-place_details = fetch_place_details(place_id, api_key)
 
-if place_details:
-    print(place_details)  # Tutaj możesz przetwarzać dane
-else:
-    print("Błąd w pobieraniu danych z Google Maps API")
+
+
+
+
+
+
+
+    
+  ###  #gmaps.place(place_id, review={'text': 'Thank you for your feedback!', 'language': 'en'})
